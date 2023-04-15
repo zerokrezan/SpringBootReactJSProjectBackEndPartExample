@@ -1,6 +1,6 @@
 package com.springbootReactExample.springbootbackend.controller;
 
-import com.springbootReactExample.springbootbackend.UserService;
+import com.springbootReactExample.springbootbackend.service.UserService;
 import com.springbootReactExample.springbootbackend.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

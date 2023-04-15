@@ -1,4 +1,4 @@
-package com.springbootReactExample.springbootbackend;
+package com.springbootReactExample.springbootbackend.service;
 
 import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
