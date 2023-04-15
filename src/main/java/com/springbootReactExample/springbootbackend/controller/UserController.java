@@ -29,7 +29,16 @@ public class UserController {
 	@DeleteMapping("users")
 	public void deleteUser(@RequestParam("id") int id){
 		long idLong = id;
+		//TODO: use logger instead of printing id's
 		System.out.println(idLong);
 		this.userService.deleteUser(idLong);
 	}
+
+	@PutMapping("users")
+	public void updateUser(@RequestParam("id") int id, @RequestParam("firstName") String firstName,
+						   @RequestParam("lastName") String lastName, @RequestParam("email") String email ){
+		long idLong = id;
+		this.userService.updateUser(idLong, firstName, lastName, email);
+	}
+
 }

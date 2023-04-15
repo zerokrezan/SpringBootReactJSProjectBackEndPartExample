@@ -4,12 +4,9 @@ import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +26,33 @@ public class UserService {
 		Set<User> allUsers = new LinkedHashSet<>(userRepository.findAll());
 		return allUsers.stream().toList();
 	}
-	
+
+	private void renameUsersFirstName(User user, String firstName){
+		user.setFirstName(firstName);
+	}
+
+	private void renameUsersLastName(User user, String lastName){
+		user.setLastName(lastName);
+	}
+
+	private void renameUsersEmail(User user, String email){
+		user.setEmail(email);
+	}
+
+	public void updateUser(long userId, String firstName, String lastName, String email){
+		Optional<User> user = userRepository.findById(userId);
+		if (user.isPresent()){
+			if (!firstName.isEmpty())
+				renameUsersFirstName(user.get(), firstName);
+			if (!lastName.isEmpty())
+				renameUsersLastName(user.get(), lastName);
+			if (!email.isEmpty())
+				renameUsersEmail(user.get(), email);
+			userRepository.saveAndFlush(user.get());
+		}
+	}
+
+
 	public Set<User> getUserByFirstName(String firstName){
 		Set<User> usersByFirstName = new LinkedHashSet<>();
 		userRepository.findByLastName(firstName).stream().map((usersByFirstName::add));
