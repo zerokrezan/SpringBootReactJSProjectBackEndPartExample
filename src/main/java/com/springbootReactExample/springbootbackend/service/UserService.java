@@ -1,5 +1,7 @@
 package com.springbootReactExample.springbootbackend.service;
 
+import com.springbootReactExample.springbootbackend.exceptions.PasswordIsInUseException;
+import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +17,11 @@ public class UserService {
 	private final UserRepository userRepository;
 
 	public void createUser(User user){
-		userRepository.save(user);
+		if (userRepository.findByPassword(user.getPassword()).isPresent()) {
+			throw new PasswordIsInUseException();
+		} else {
+			userRepository.save(user);
+		}
 	}
 
 	public void deleteUser(long userId){
@@ -52,10 +58,14 @@ public class UserService {
 		}
 	}
 
+	public void assignAdminRights(long userId){
+		Optional<User> user = userRepository.findById(userId);
+		user.ifPresent(value -> value.setAdminRights(true));
+	}
 
 	public Set<User> getUserByFirstName(String firstName){
 		Set<User> usersByFirstName = new LinkedHashSet<>();
-		userRepository.findByLastName(firstName).stream().map((usersByFirstName::add));
+		userRepository.findByFirstName(firstName).stream().map((usersByFirstName::add));
 		return usersByFirstName;
 	}
 
@@ -63,6 +73,15 @@ public class UserService {
 		Set<User> usersByLastName = new HashSet<>();
 		userRepository.findByLastName(lastName).stream().map((usersByLastName::add));
 		return usersByLastName;
+	}
+
+	public User getUserById(long userId){
+		Optional<User> user = userRepository.findById(userId);
+		if(user.isPresent()){
+			return user.get();
+		}else {
+			throw new UserDoesNotExistException();
+		}
 	}
 
 }
