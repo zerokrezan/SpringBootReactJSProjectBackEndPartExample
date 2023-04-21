@@ -16,10 +16,12 @@ public class User {
 
 	private String lastName;
 
+	//TODO: email als unique übergeben!
 	private String email;
 
 	private boolean adminRights = false;
 
+	//TODO: password als unique übergeben!
 	private String password;
 	public User() {
 
@@ -36,5 +38,16 @@ public class User {
 		this.firstName = firstName;
 		this.lastName = lastName;
 		this.email = email;
+	}
+
+	public User(String email, String password){
+		this.email = email;
+		this.password = password;
+	}
+
+	public User(String email, String password, boolean adminRights){
+		this.email = email;
+		this.password = password;
+		this.adminRights = adminRights;
 	}
 }

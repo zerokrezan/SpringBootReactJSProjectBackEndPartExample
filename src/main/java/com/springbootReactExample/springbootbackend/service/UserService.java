@@ -1,18 +1,26 @@
 package com.springbootReactExample.springbootbackend.service;
 
+import com.springbootReactExample.springbootbackend.controller.UserController;
 import com.springbootReactExample.springbootbackend.exceptions.PasswordIsInUseException;
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
+import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
+	private static final Logger LOGGER = LogManager.getLogger(UserController.class);
 	@Autowired
 	private final UserRepository userRepository;
 
@@ -84,4 +92,11 @@ public class UserService {
 		}
 	}
 
+	@Override
+	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+		LOGGER.info("check if user with: "+email+" exists");
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+		return new SecurityUser(user);
+	}
 }
