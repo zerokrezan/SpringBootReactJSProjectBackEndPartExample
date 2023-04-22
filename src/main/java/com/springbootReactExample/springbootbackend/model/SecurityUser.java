@@ -33,14 +33,19 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<? extends GrantedAuthority> list;
         LOGGER.info("check authoritiy of user: "+ user.getEmail());
         if (user.isAdminRights()){
             LOGGER.info("user with "+user.getEmail()+" has ROLE_ADMIN");
-            return List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            list = List.of(new SimpleGrantedAuthority("ROLE_ADMIN"));
+            LOGGER.info("user who is just logged in has authority as admin");
+            return list;
 
         }
         LOGGER.info("user with "+user.getEmail()+" has ROLE_USER");
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        list = List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        LOGGER.info("user who ist just logged in has authority as user");
+        return list;
     }
 
     @Override

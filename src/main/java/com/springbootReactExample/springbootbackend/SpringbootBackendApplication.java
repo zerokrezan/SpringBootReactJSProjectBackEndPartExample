@@ -33,12 +33,12 @@ public class SpringbootBackendApplication implements CommandLineRunner {
 				LOGGER.info("new user created: "+ "useremail@hotmail.de ");
 				return;
 			}
-			LOGGER.info("\"user already exists: \"+ \"useremail@hotmail.de \"");
+			LOGGER.info("user already exists:"+ " useremail@hotmail.de");
 		};
 	}
 
 	@Override
-	public void run(String... args) throws Exception {
+	public void run(String... args) {
 		Optional<User> adminUser = userRepository.findByPassword("123456");
 		if (adminUser.isPresent()){
 			System.out.println("adminUser found from DB: " + adminUser.get().getFirstName() + " " + adminUser.get().getLastName()

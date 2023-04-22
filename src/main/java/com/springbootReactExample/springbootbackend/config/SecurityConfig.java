@@ -23,7 +23,24 @@ public class SecurityConfig {
     private final UserService myUserDetailsService;
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http
+        /*http
+                // ...
+
+                .formLogin()
+                //.loginProcessingUrl("/perform_login")
+                .defaultSuccessUrl("/logouts", true)
+                .failureUrl("/login.html?error=true")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .and()
+                .userDetailsService(myUserDetailsService)
+                .headers()
+                .and()
+                .logout()
+                .logoutUrl("/logout")
+                .deleteCookies("JSESSIONID");
+        return http.build();*/
+        http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
@@ -33,8 +50,8 @@ public class SecurityConfig {
                 .formLogin()
                     //.loginPage("/login")
                     .permitAll()
-                    .defaultSuccessUrl("/")
-                    .failureUrl("/login?error=true")
+                    .defaultSuccessUrl("/logout", true)
+                    .failureUrl("/authentificationFailed")
                     .usernameParameter("email")
                     .passwordParameter("password")
                 .and()
@@ -47,9 +64,16 @@ public class SecurityConfig {
                     .logoutUrl("/logout")
                     .logoutSuccessUrl("/")
                     .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID")
-                    .and()
-                .build();
+                    .deleteCookies("JSESSIONID");
+
+
+                return http.build();
+
+
+
+
+
+
         /*return http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeHttpRequests((auth) -> auth
