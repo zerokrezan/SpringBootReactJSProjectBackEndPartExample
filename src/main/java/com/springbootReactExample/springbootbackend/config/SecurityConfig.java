@@ -1,3 +1,4 @@
+
 package com.springbootReactExample.springbootbackend.config;
 
 import com.springbootReactExample.springbootbackend.service.UserService;
@@ -11,6 +12,13 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -21,38 +29,48 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
     @Autowired
     private final UserService myUserDetailsService;
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*"));
+        configuration.setAllowedMethods(Arrays.asList("*"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
+
+    @Bean
+    WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**").allowedOrigins("*");
+            }
+        };
+    }
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        /*http
-                // ...
 
-                .formLogin()
-                //.loginProcessingUrl("/perform_login")
-                .defaultSuccessUrl("/logouts", true)
-                .failureUrl("/login.html?error=true")
-                .usernameParameter("email")
-                .passwordParameter("password")
-                .and()
-                .userDetailsService(myUserDetailsService)
-                .headers()
-                .and()
-                .logout()
-                .logoutUrl("/logout")
-                .deleteCookies("JSESSIONID");
-        return http.build();*/
         http
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+                .csrf().disable()
+                //.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/login"))
+                //.csrf(c->c.ignoringRequestMatchers("/login"))
+                .cors()
+                .and()
                 .authorizeRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
-                        .requestMatchers("/api/posts/**").permitAll()
+                        //.requestMatchers("/api/posts/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin()
-                    //.loginPage("/login")
+                    //.loginPage("http://localhost:3000/")
                     .permitAll()
-                    .defaultSuccessUrl("/logout", true)
+                    //.defaultSuccessUrl("/logout", true)
+                    //.defaultSuccessUrl("http://localhost:3000/users", true)
                     .failureUrl("/authentificationFailed")
-                    .usernameParameter("email")
+                    .usernameParameter("username")
                     .passwordParameter("password")
                 .and()
                 .userDetailsService(myUserDetailsService)
@@ -62,7 +80,7 @@ public class SecurityConfig {
                 .httpBasic(withDefaults())
                 .logout() // add logout configuration
                     .logoutUrl("/logout")
-                    .logoutSuccessUrl("/")
+                    .logoutSuccessUrl("/login")
                     .invalidateHttpSession(true)
                     .deleteCookies("JSESSIONID");
 
@@ -74,7 +92,8 @@ public class SecurityConfig {
 
 
 
-        /*return http
+
+/*return http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/h2-console/**", "/login").permitAll()
@@ -93,9 +112,11 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions().sameOrigin())
                 .httpBasic(withDefaults())
                 //.formLogin(Customizer.withDefaults())
-                .build();*/
+                .build();*//*
 
-        /*return http
+
+
+/*return http
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
                 .authorizeRequests(auth -> auth
                         .requestMatchers("/h2-console/**").permitAll()
@@ -106,6 +127,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions().sameOrigin())
                 .httpBasic(withDefaults())
                 .build();*/
+
     }
     @Bean
     PasswordEncoder passwordEncoder() {
@@ -113,3 +135,4 @@ public class SecurityConfig {
         //return new BCryptPasswordEncoder();
     }
 }
+

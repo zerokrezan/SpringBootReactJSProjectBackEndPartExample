@@ -35,8 +35,8 @@ public class UserController {
 	@PostMapping("newUser")
 	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("email") String email){
 		try{
+			LOGGER.info(firstName, lastName, email);
 			this.userService.createUser(new User(firstName, lastName, email));
-			//LOGGER.info("create new user: "+ );
 		}catch (PasswordIsInUseException passwordIsInUseException){
 			LOGGER.error(passwordIsInUseException);
 		}

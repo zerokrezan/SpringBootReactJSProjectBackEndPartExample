@@ -15,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -26,6 +28,7 @@ public class UserService implements UserDetailsService {
 
 	public void createUser(User user){
 		if (userRepository.findByPassword(user.getPassword()).isPresent()) {
+			LOGGER.info(user.getPassword());
 			throw new PasswordIsInUseException();
 		} else {
 			userRepository.save(user);
@@ -93,10 +96,12 @@ public class UserService implements UserDetailsService {
 	}
 
 	@Override
-	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-		LOGGER.info("check if user with: "+email+" exists");
-		User user = userRepository.findByEmail(email)
-				.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		String decodedEmail = URLDecoder.decode(username, StandardCharsets.UTF_8);
+		LOGGER.info("check if user with email: " + URLDecoder.decode(username, StandardCharsets.UTF_8) + " exists");
+		User user = userRepository.findByEmail(URLDecoder.decode(username, StandardCharsets.UTF_8))
+				.orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + URLDecoder.decode(username, StandardCharsets.UTF_8)));
 		return new SecurityUser(user);
+
 	}
 }
