@@ -1,8 +1,11 @@
 
 package com.springbootReactExample.springbootbackend.config;
 
+import com.springbootReactExample.springbootbackend.controller.UserController;
 import com.springbootReactExample.springbootbackend.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,6 +15,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -79,11 +83,12 @@ public class SecurityConfig {
                     .and()
                 .httpBasic(withDefaults())
                 .logout() // add logout configuration
-                    .logoutUrl("/logout")
-                    .logoutSuccessUrl("/login")
+                    //.logoutUrl("/logout")
+                    //.logoutSuccessHandler(logoutSuccessHandler())
                     .invalidateHttpSession(true)
-                    .deleteCookies("JSESSIONID");
-
+                    .deleteCookies("JSESSIONID")
+                    .and()
+                .httpBasic(withDefaults());
 
                 return http.build();
 
@@ -133,6 +138,22 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
         //return new BCryptPasswordEncoder();
+    }
+
+    private static final Logger LOGGER = LogManager.getLogger(UserController.class);
+
+    @Bean
+    LogoutSuccessHandler logoutSuccessHandler(){
+        return (request, response, authentication) -> {
+            LOGGER.info("logoutsuccesshandler");
+            // Perform any desired logging or additional actions here
+            if (authentication != null) {
+                LOGGER.info("authentication "+ authentication);
+                String username = authentication.getName();
+                System.out.println("User logged out: " + username);
+            }
+            //response.sendRedirect("/login"); // Redirect to the login page after logout
+        };
     }
 }
 
