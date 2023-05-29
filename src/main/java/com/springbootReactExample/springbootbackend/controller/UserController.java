@@ -16,8 +16,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
-
+//TODO: add Logs for each endpoint request for a better overview and trace
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("api/")
@@ -37,20 +38,20 @@ public class UserController {
 	//TODO: password as requestParam for updateUser() - method
 
 	@RequestMapping("/logout")
-	public void logout(HttpServletRequest request, HttpServletResponse response) {
+	public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		// Perform any desired logging or additional actions here
 		if (authentication != null) {
 			String username = authentication.getName();
-			System.out.println("User logged out: " + username);
+			LOGGER.info("User logged out: "+ username);
 		}
 
 		// Logout the user using the SecurityContextLogoutHandler
 		new SecurityContextLogoutHandler().logout(request, response, authentication);
 
 		// Optionally, redirect to the login page or any other desired page
-		// response.sendRedirect("/login");
+		// response.sendRedirect();
 	}
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@PostMapping("newUser")

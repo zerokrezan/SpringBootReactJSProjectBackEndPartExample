@@ -1,6 +1,5 @@
 package com.springbootReactExample.springbootbackend.model;
 
-import com.springbootReactExample.springbootbackend.controller.UserController;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.LogManager;
@@ -9,12 +8,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
 public class SecurityUser implements UserDetails {
-    private static final Logger LOGGER = LogManager.getLogger(UserController.class);
+    private static final Logger LOGGER = LogManager.getLogger(SecurityUser.class);
     private final User user;
 
     public SecurityUser(User user) {
