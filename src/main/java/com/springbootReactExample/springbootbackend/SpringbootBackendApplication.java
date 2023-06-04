@@ -42,7 +42,7 @@ public class SpringbootBackendApplication implements CommandLineRunner {
 		Optional<User> adminUser = userRepository.findByPassword("123456");
 		if (adminUser.isPresent()){
 			System.out.println("adminUser found from DB: " + adminUser.get().getFirstName() + " " + adminUser.get().getLastName()
-					+ " " + adminUser.get().getEmail());
+					+ " " + adminUser.get().getId());
 
 		}
 		else {
@@ -50,7 +50,7 @@ public class SpringbootBackendApplication implements CommandLineRunner {
 			newAdminUser.setAdminRights(true);
 			userRepository.save(newAdminUser);
 			System.out.println("new adminUser created "+ newAdminUser.getFirstName() + " " + newAdminUser.getLastName()
-					+ " " + newAdminUser.getEmail());
+					+ " " + newAdminUser.getId());
 
 		}
 	}

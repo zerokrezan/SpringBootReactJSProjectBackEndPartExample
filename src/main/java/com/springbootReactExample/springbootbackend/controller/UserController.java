@@ -55,10 +55,10 @@ public class UserController {
 	}
 	@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@PostMapping("newUser")
-	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("email") String email){
+	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("id") String id){
 		try{
-			LOGGER.info(firstName, lastName, email);
-			this.userService.createUser(new User(firstName, lastName, email));
+			LOGGER.info(firstName, lastName, id);
+			this.userService.createUser(new User(firstName, lastName, id));
 		}catch (PasswordIsInUseException passwordIsInUseException){
 			LOGGER.error(passwordIsInUseException);
 		}
@@ -66,12 +66,11 @@ public class UserController {
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("users")
-	public void deleteUser(@RequestParam("id") int id){
-		long idLong = id;
+	public void deleteUser(@RequestParam("id") String id){
 		try{
 			User user = userService.getUserById(id);
-			LOGGER.info("Delete User: "+user.getId()+" "+user.getFirstName()+" "+user.getLastName()+" "+user.getEmail()+" ");
-			this.userService.deleteUser(idLong);
+			LOGGER.info("Delete User: "+" "+user.getFirstName()+" "+user.getLastName()+" "+user.getId()+" ");
+			this.userService.deleteUser(user.getId());
 		}catch (UserDoesNotExistException userDoesNotExistException){
 			LOGGER.warn(userDoesNotExistException);
 		}
@@ -79,10 +78,9 @@ public class UserController {
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@PutMapping("users")
-	public void updateUser(@RequestParam("id") int id, @RequestParam("firstName") String firstName,
-						   @RequestParam("lastName") String lastName, @RequestParam("email") String email ){
-		long idLong = id;
-		this.userService.updateUser(idLong, firstName, lastName, email);
+	public void updateUser(@RequestParam("firstName") String firstName,
+						   @RequestParam("lastName") String lastName, @RequestParam("id") String id ){
+		this.userService.updateUser(firstName, lastName, id);
 	}
 
 }

@@ -8,20 +8,18 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
 
 	private String firstName;
 
 	private String lastName;
 
-	//TODO: email als unique übergeben!
-	private String email;
+	//DONE:email als unique übergeben!
+	@Id
+	@Column(name = "email")
+	private String id;
 
 	private boolean adminRights = false;
 
-	//TODO: password als unique übergeben!
 	private String password;
 	public User() {
 
@@ -30,23 +28,23 @@ public class User {
 	public User(String firstName, String lastName, String email, String password) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email = email;
+		this.id = email;
 		this.password = password;
 	}
 
 	public User(String firstName, String lastName, String email) {
 		this.firstName = firstName;
 		this.lastName = lastName;
-		this.email = email;
+		this.id = email;
 	}
 
 	public User(String email, String password){
-		this.email = email;
+		this.id = email;
 		this.password = password;
 	}
 
 	public User(String email, String password, boolean adminRights){
-		this.email = email;
+		this.id = email;
 		this.password = password;
 		this.adminRights = adminRights;
 	}

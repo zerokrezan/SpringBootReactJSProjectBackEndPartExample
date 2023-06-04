@@ -24,7 +24,7 @@ public class UserService implements UserDetailsService {
 	private static final Logger LOGGER = LogManager.getLogger(UserService.class);
 	@Autowired
 	private final UserRepository userRepository;
-
+	//TODO: avoid working with and retriving password
 	public void createUser(User user){
 		if (userRepository.findByPassword(user.getPassword()).isPresent()) {
 			LOGGER.info(user.getPassword());
@@ -34,8 +34,8 @@ public class UserService implements UserDetailsService {
 		}
 	}
 
-	public void deleteUser(long userId){
-		userRepository.deleteById(userId);
+	public void deleteUser(String id){
+		userRepository.deleteById(id);
 	}
 
 	public List<User> getUsers(){
@@ -51,24 +51,19 @@ public class UserService implements UserDetailsService {
 		user.setLastName(lastName);
 	}
 
-	private void renameUsersEmail(User user, String email){
-		user.setEmail(email);
-	}
-
-	public void updateUser(long userId, String firstName, String lastName, String email){
-		Optional<User> user = userRepository.findById(userId);
+	public void updateUser(String firstName, String lastName, String id){
+		Optional<User> user = userRepository.findById(id);
 		if (user.isPresent()){
 			if (!firstName.isEmpty())
 				renameUsersFirstName(user.get(), firstName);
 			if (!lastName.isEmpty())
 				renameUsersLastName(user.get(), lastName);
-			if (!email.isEmpty())
-				renameUsersEmail(user.get(), email);
+			//TODO: update id?
 			userRepository.saveAndFlush(user.get());
 		}
 	}
 
-	public void assignAdminRights(long userId){
+	public void assignAdminRights(String userId){
 		Optional<User> user = userRepository.findById(userId);
 		user.ifPresent(value -> value.setAdminRights(true));
 	}
@@ -85,7 +80,7 @@ public class UserService implements UserDetailsService {
 		return usersByLastName;
 	}
 
-	public User getUserById(long userId){
+	public User getUserById(String userId){
 		Optional<User> user = userRepository.findById(userId);
 		if(user.isPresent()){
 			return user.get();
@@ -100,8 +95,8 @@ public class UserService implements UserDetailsService {
 		if (username.isEmpty()) {
 			throw new UserDoesNotExistException();
 		}
-		LOGGER.info("check if user with email: " + URLDecoder.decode(username, StandardCharsets.UTF_8) + " exists");
-		User user2 = userRepository.findByEmail(URLDecoder.decode(username, StandardCharsets.UTF_8))
+		LOGGER.info("check if user with email/ID: " + URLDecoder.decode(username, StandardCharsets.UTF_8) + " exists");
+		User user2 = userRepository.findById(URLDecoder.decode(username, StandardCharsets.UTF_8))
 				.orElseThrow(UserDoesNotExistException::new);
 
 		return new SecurityUser(user2);
