@@ -1,6 +1,7 @@
 package com.springbootReactExample.springbootbackend.service;
 
 import com.springbootReactExample.springbootbackend.exceptions.PasswordIsInUseException;
+import com.springbootReactExample.springbootbackend.exceptions.UserAlreadyExistsException;
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
@@ -24,11 +25,18 @@ public class UserService implements UserDetailsService {
 	private static final Logger LOGGER = LogManager.getLogger(UserService.class);
 	@Autowired
 	private final UserRepository userRepository;
-	//TODO: avoid working with and retriving password
+
+	//DONE: check for email/id existing before creating new user
+	//TODO: PasswordEncryption has to be done for DB storage
 	public void createUser(User user){
+		//BCryptPasswordEncoder becrypt = new BCryptPasswordEncoder();
 		if (userRepository.findByPassword(user.getPassword()).isPresent()) {
-			LOGGER.info(user.getPassword());
+			LOGGER.error("password: "+ user.getPassword()+ " is already in use");
 			throw new PasswordIsInUseException();
+		}
+		else if (userRepository.findById(user.getId()).isPresent()){
+			LOGGER.error("user with id: "+ user.getId()+ " already exists");
+			throw new UserAlreadyExistsException();
 		} else {
 			userRepository.save(user);
 		}

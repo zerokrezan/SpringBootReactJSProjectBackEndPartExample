@@ -1,6 +1,5 @@
 package com.springbootReactExample.springbootbackend.controller;
 
-import com.springbootReactExample.springbootbackend.exceptions.PasswordIsInUseException;
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.service.UserService;
@@ -34,8 +33,8 @@ public class UserController {
 		return this.userService.getUsers();
 	}
 
-	//TODO: password as requestParam for createUser() - method
-	//TODO: password as requestParam for updateUser() - method
+	//DONE: password as requestParam for createUser() - method
+	//TODO: password as requestParam for resetUserPassword - method
 
 	@RequestMapping("/logout")
 	public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -53,14 +52,16 @@ public class UserController {
 		// Optionally, redirect to the login page or any other desired page
 		// response.sendRedirect();
 	}
-	@PreAuthorize("hasAnyRole('ADMIN','USER')")
+	@PreAuthorize("hasRole('ADMIN')")
+	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@PostMapping("newUser")
-	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("id") String id){
+	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("id") String id,
+						   @RequestParam("password") String password){
 		try{
-			LOGGER.info(firstName, lastName, id);
-			this.userService.createUser(new User(firstName, lastName, id));
-		}catch (PasswordIsInUseException passwordIsInUseException){
-			LOGGER.error(passwordIsInUseException);
+			LOGGER.info(firstName +" " +lastName+" " + id+" " + password);
+			this.userService.createUser(new User(firstName, lastName, id, password));
+		}catch (Exception exception){
+			LOGGER.error(exception);
 		}
 	}
 
