@@ -66,7 +66,6 @@ public class UserService implements UserDetailsService {
 				renameUsersFirstName(user.get(), firstName);
 			if (!lastName.isEmpty())
 				renameUsersLastName(user.get(), lastName);
-			//TODO: update id?
 			userRepository.saveAndFlush(user.get());
 		}
 	}
@@ -109,5 +108,16 @@ public class UserService implements UserDetailsService {
 
 		return new SecurityUser(user2);
 
+	}
+
+	public void resetUsersPassword(String id, String newPassword) {
+		Optional<User> user = userRepository.findById(id);
+		if (user.isPresent()){
+			if (!newPassword.isEmpty()) {
+				LOGGER.info("reseting user's password: "+ id);
+				user.get().setPassword(newPassword);
+			}
+			userRepository.saveAndFlush(user.get());
+		}
 	}
 }

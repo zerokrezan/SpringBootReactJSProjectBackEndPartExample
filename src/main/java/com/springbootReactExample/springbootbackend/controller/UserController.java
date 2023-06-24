@@ -34,7 +34,9 @@ public class UserController {
 	}
 
 	//DONE: password as requestParam for createUser() - method
-	//TODO: password as requestParam for resetUserPassword - method
+	//DONE: requestPassword method for admin
+	//TODO: resetUsersPasswordRequest method for user to admin
+	//TODO: resetUsersMail method for user to admin
 
 	@RequestMapping("/logout")
 	public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -82,6 +84,20 @@ public class UserController {
 	public void updateUser(@RequestParam("firstName") String firstName,
 						   @RequestParam("lastName") String lastName, @RequestParam("id") String id ){
 		this.userService.updateUser(firstName, lastName, id);
+	}
+
+	@PreAuthorize("hasRole('ADMIN')")
+	@PutMapping("users")
+	public void resetUsersPassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
+		this.userService.resetUsersPassword(id, newPassword);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@PostMapping("requestPasswordReset")
+	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
+		//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
+		//TODO: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
+		
 	}
 
 }
