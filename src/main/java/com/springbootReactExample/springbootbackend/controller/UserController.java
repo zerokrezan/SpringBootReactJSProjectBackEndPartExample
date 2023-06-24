@@ -87,8 +87,8 @@ public class UserController {
 	}
 
 	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("users")
-	public void resetUsersPassword(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
+	@PutMapping("users/{id}/reset-password")
+	public void resetUsersPassword(@PathVariable("id") String id, @RequestParam("newPassword") String newPassword){
 		this.userService.resetUsersPassword(id, newPassword);
 	}
 
@@ -97,7 +97,7 @@ public class UserController {
 	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
 		//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
 		//TODO: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
-		
+
 	}
 
 }
