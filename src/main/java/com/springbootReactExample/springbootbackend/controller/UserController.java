@@ -2,6 +2,7 @@ package com.springbootReactExample.springbootbackend.controller;
 
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.requests.RequestId;
 import com.springbootReactExample.springbootbackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 //TODO: add Logs for each endpoint request for a better overview and trace
 @CrossOrigin(origins = "http://localhost:3000")
@@ -96,7 +98,9 @@ public class UserController {
 	@PostMapping("requestPasswordReset")
 	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
 		//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
-		//TODO: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
+		//DONE: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
+		LocalDateTime localDateTime = LocalDateTime.now();
+		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now()));
 
 	}
 

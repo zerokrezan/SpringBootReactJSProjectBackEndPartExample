@@ -5,7 +5,10 @@ import com.springbootReactExample.springbootbackend.exceptions.UserAlreadyExists
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.requests.RequestId;
+import com.springbootReactExample.springbootbackend.model.requests.ResetPasswordRequest;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
+import com.springbootReactExample.springbootbackend.repository.UserRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,6 +28,8 @@ public class UserService implements UserDetailsService {
 	private static final Logger LOGGER = LogManager.getLogger(UserService.class);
 	@Autowired
 	private final UserRepository userRepository;
+	@Autowired
+	private final UserRequestRepository userRequestRepository;
 
 	//DONE: check for email/id existing before creating new user
 	//TODO: PasswordEncryption has to be done for DB storage
@@ -119,5 +124,14 @@ public class UserService implements UserDetailsService {
 			}
 			userRepository.saveAndFlush(user.get());
 		}
+	}
+
+	public void requestPasswordReset(RequestId requestId) {
+		LOGGER.info(requestId.getUserId());
+		LOGGER.info(requestId.getLocalDateTime());
+		LOGGER.info("user: "+ requestId.getUserId() + " is requesting PasswordRequest!");
+		userRequestRepository.save(new ResetPasswordRequest(requestId));
+		LOGGER.info("PasswordRequest by user: "+ requestId.getUserId() + " just requested.");
+		LOGGER.info("waiting for admin's action!");
 	}
 }
