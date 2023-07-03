@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface resetPasswordRequest extends JpaRepository<ResetPasswordRequest, RequestId> {
+public interface resetPasswordRequestRepository extends JpaRepository<ResetPasswordRequest, RequestId> {
     //TODO: findByUserId and findByLocalDateTime
 
 }

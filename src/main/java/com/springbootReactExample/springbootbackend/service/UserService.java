@@ -8,7 +8,7 @@ import com.springbootReactExample.springbootbackend.model.User;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
 import com.springbootReactExample.springbootbackend.model.requests.ResetPasswordRequest;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
-import com.springbootReactExample.springbootbackend.repository.UserRequestRepository;
+import com.springbootReactExample.springbootbackend.repository.resetPasswordRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +29,7 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private final UserRepository userRepository;
 	@Autowired
-	private final UserRequestRepository userRequestRepository;
+	private final resetPasswordRequestRepository resetPasswordRequestRepository;
 
 	//DONE: check for email/id existing before creating new user
 	//TODO: PasswordEncryption has to be done for DB storage
@@ -115,13 +115,17 @@ public class UserService implements UserDetailsService {
 
 	}
 
-	public void resetUsersPassword(String id, String newPassword) {
+	public void resetUsersPassword(String id,String requestTime ,String newPassword) {
 		Optional<User> user = userRepository.findById(id);
 		if (user.isPresent()){
 			if (!newPassword.isEmpty()) {
 				LOGGER.info("reseting user's password: "+ id);
 				user.get().setPassword(newPassword);
 			}
+			RequestId requestId = new RequestId(id, requestTime);
+			Optional<ResetPasswordRequest> resetPasswordRequest = resetPasswordRequestRepository.findById(requestId);
+			resetPasswordRequest.ifPresent(resetPasswordRequestRepository::delete);
+
 			userRepository.saveAndFlush(user.get());
 		}
 	}
@@ -130,7 +134,7 @@ public class UserService implements UserDetailsService {
 		LOGGER.info(requestId.getUserId());
 		LOGGER.info(requestId.getLocalDateTime());
 		LOGGER.info("user: "+ requestId.getUserId() + " is requesting PasswordRequest!");
-		userRequestRepository.save(new ResetPasswordRequest(requestId));
+		resetPasswordRequestRepository.save(new ResetPasswordRequest(requestId));
 		LOGGER.info("PasswordRequest by user: "+ requestId.getUserId() + " just requested.");
 		LOGGER.info("waiting for admin's action!");
 	}

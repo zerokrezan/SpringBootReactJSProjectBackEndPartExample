@@ -5,16 +5,15 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Embeddable
 @Getter
 @Setter
 public class RequestId implements Serializable {
     private String userId;
-    private LocalDateTime localDateTime;
+    private String localDateTime;
 
-    public RequestId(String userId, LocalDateTime localDateTime) {
+    public RequestId(String userId, String localDateTime) {
         this.userId = userId;
         this.localDateTime = localDateTime;
     }

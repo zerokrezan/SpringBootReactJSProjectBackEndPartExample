@@ -12,6 +12,7 @@ import lombok.Setter;
 @Table(name = "resetpasswordrequests")
 public class ResetPasswordRequest extends Request {
 
+    //TODO:newPassword
     @EmbeddedId
     private RequestId requestId;
     public ResetPasswordRequest(RequestId requestId) {

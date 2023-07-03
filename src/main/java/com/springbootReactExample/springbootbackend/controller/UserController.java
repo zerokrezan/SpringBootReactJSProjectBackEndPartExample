@@ -2,7 +2,9 @@ package com.springbootReactExample.springbootbackend.controller;
 
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.requests.Request;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
+import com.springbootReactExample.springbootbackend.service.RequestService;
 import com.springbootReactExample.springbootbackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,6 +30,8 @@ public class UserController {
 	private static final Logger LOGGER = LogManager.getLogger(UserController.class);
 	@Autowired
 	private final UserService userService;
+	@Autowired
+	private final RequestService requestService;
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users")
@@ -88,20 +92,41 @@ public class UserController {
 		this.userService.updateUser(firstName, lastName, id);
 	}
 
+	/**
+	 * admin accepts reset-password request
+	 * @param id
+	 * @param newPassword
+	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("users/{id}/reset-password")
-	public void resetUsersPassword(@PathVariable("id") String id, @RequestParam("newPassword") String newPassword){
-		this.userService.resetUsersPassword(id, newPassword);
+	@PutMapping("users/reset-password/{id}/{requestTime}/{newPassword}")
+	public void resetUsersPassword(@PathVariable("id") String id, @PathVariable("requestTime") String requestTime,@PathVariable("newPassword") String newPassword){
+		this.userService.resetUsersPassword(id,requestTime,newPassword);
 	}
+
+	/**
+	 * admin refuses reset-pasword request
+	 * @return
+	 * @param
+	 */
+	//TODO:
+	/*@PreAuthorize("hasRole('ADMIN')")
+	@DeleteMapping("users/{id}/{requestTime}/reset-password")
+	public void refuseResetPasswordRequest(@RequestParam("id")) {
+		return this.requestService.getRequests();
+	}*/
 
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping("requestPasswordReset")
 	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
-		//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
 		//DONE: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
-		LocalDateTime localDateTime = LocalDateTime.now();
-		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now()));
+		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now().toString()));
+	}
 
+	//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
+	@PreAuthorize("hasRole('ADMIN')")
+	@GetMapping("requests")
+	public <T extends Request> List<T> getRequests() {
+		return this.requestService.getRequests();
 	}
 
 }
