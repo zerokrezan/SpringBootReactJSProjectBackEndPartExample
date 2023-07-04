@@ -61,7 +61,6 @@ public class UserController {
 		// response.sendRedirect();
 	}
 	@PreAuthorize("hasRole('ADMIN')")
-	//@PreAuthorize("hasAnyRole('ADMIN','USER')")
 	@PostMapping("newUser")
 	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("id") String id,
 						   @RequestParam("password") String password){
