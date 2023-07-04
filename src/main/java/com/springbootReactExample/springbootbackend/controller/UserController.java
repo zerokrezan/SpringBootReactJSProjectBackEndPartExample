@@ -41,7 +41,7 @@ public class UserController {
 
 	//DONE: password as requestParam for createUser() - method
 	//DONE: requestPassword method for admin
-	//TODO: resetUsersPasswordRequest method for user to admin
+	//DONE: resetUsersPasswordRequest method for user to admin
 	//TODO: resetUsersMail method for user to admin
 
 	@RequestMapping("/logout")
