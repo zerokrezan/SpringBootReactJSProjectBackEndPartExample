@@ -5,6 +5,7 @@ import com.springbootReactExample.springbootbackend.exceptions.UserAlreadyExists
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.requests.Request;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
 import com.springbootReactExample.springbootbackend.model.requests.ResetPasswordRequest;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
@@ -115,12 +116,21 @@ public class UserService implements UserDetailsService {
 
 	}
 
+	//DONE: validate if newPassword is used from another user
 	public void resetUsersPassword(String id,String requestTime ,String newPassword) {
 		Optional<User> user = userRepository.findById(id);
 		if (user.isPresent()){
-			if (!newPassword.isEmpty()) {
+			Optional<User> passwordUsed = userRepository.findByPassword(newPassword);
+			if (!newPassword.isEmpty() && passwordUsed.isEmpty()) {
 				LOGGER.info("reseting user's password: "+ id);
 				user.get().setPassword(newPassword);
+			}else {
+				LOGGER.error(new PasswordIsInUseException().toString());
+				LOGGER.error("deleting this request of type RequestPasswordReset with id: "+ id + " and requestTime: "+ requestTime);
+				Optional<ResetPasswordRequest> request =  resetPasswordRequestRepository.findById(new RequestId(id, requestTime));
+				request.ifPresent(resetPasswordRequestRepository::delete);
+				LOGGER.error("request of type RequestPasswordReset with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
+				throw new PasswordIsInUseException();
 			}
 			RequestId requestId = new RequestId(id, requestTime);
 			Optional<ResetPasswordRequest> resetPasswordRequest = resetPasswordRequestRepository.findById(requestId);
