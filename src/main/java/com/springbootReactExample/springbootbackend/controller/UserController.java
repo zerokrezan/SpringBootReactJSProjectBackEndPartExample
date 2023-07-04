@@ -97,17 +97,17 @@ public class UserController {
 	 * @param newPassword
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@PutMapping("users/reset-password/{id}/{requestTime}/{newPassword}")
+	@PutMapping("users/resetPassword/{id}/{requestTime}/{newPassword}")
 	public void resetUsersPassword(@PathVariable("id") String id, @PathVariable("requestTime") String requestTime,@PathVariable("newPassword") String newPassword){
 		this.userService.resetUsersPassword(id,requestTime,newPassword);
 	}
 
+	//TODO: admin refuses resetPassword request
 	/**
-	 * admin refuses reset-pasword request
+	 * admin refuses resetPasword request
 	 * @return
 	 * @param
 	 */
-	//TODO:
 	/*@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("users/{id}/{requestTime}/reset-password")
 	public void refuseResetPasswordRequest(@RequestParam("id")) {
