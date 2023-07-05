@@ -46,6 +46,11 @@ public class UserController {
 
 	@RequestMapping("/logout")
 	public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		//using/redirecting to Spring Boot's logout page:
+		response.sendRedirect(request.getContextPath()+ "/logout");
+
+		//own logout implementation:
+/*
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
 		// Perform any desired logging or additional actions here
@@ -59,6 +64,7 @@ public class UserController {
 
 		// Optionally, redirect to the login page or any other desired page
 		// response.sendRedirect();
+*/
 	}
 	@PreAuthorize("hasRole('ADMIN')")
 	@PostMapping("newUser")
@@ -102,30 +108,39 @@ public class UserController {
 		this.userService.resetUsersPassword(id,requestTime,newPassword);
 	}
 
-	//TODO: admin refuses resetPassword request
+	//DONE: admin refuses resetPassword request
 	/**
 	 * admin refuses resetPasword request
 	 * @return
 	 * @param
 	 */
-	/*@PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	@DeleteMapping("users/{id}/{requestTime}/reset-password")
-	public void refuseResetPasswordRequest(@RequestParam("id")) {
-		return this.requestService.getRequests();
-	}*/
+	public void refuseResetPasswordRequest(@PathVariable("id") String id, @PathVariable("requestTime") String requestTime,
+										   @RequestParam("newPassword") String newPassword ) {
+		this.userService.refusePasswordReset(id, requestTime, newPassword);
+
+	}
 
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping("requestPasswordReset")
 	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
 		//DONE: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
-		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now().toString()));
+		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now().toString()), newPassword);
 	}
 
-	//TODO: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
+	//DONE: save request/s to admin's dashboard -> wait until admin accepty or defuses the request
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("requests")
 	public <T extends Request> List<T> getRequests() {
 		return this.requestService.getRequests();
+	}
+
+	//DONE: assignment of user's created requests to fitting user
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping("requests/{id}")
+	public <T extends Request> List<T> getUserRequests(@PathVariable("id") String id){
+		return this.requestService.getUserRequests(id);
 	}
 
 }

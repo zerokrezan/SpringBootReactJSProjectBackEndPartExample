@@ -1,7 +1,7 @@
 package com.springbootReactExample.springbootbackend.service;
 
 import com.springbootReactExample.springbootbackend.model.requests.Request;
-import com.springbootReactExample.springbootbackend.repository.resetPasswordRequestRepository;
+import com.springbootReactExample.springbootbackend.repository.ResetPasswordRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,10 +15,15 @@ import java.util.List;
 public class RequestService {
     private static final Logger LOGGER = LogManager.getLogger(RequestService.class);
     @Autowired
-    private final resetPasswordRequestRepository resetPasswordRequestRepository;
+    private final ResetPasswordRequestRepository resetPasswordRequestRepository;
 
     @SuppressWarnings("unchecked")
     public <T extends Request>List<T> getRequests(){
         return (List<T>) resetPasswordRequestRepository.findAll();
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T extends Request> List<T> getUserRequests(String id) {
+        return (List<T>) resetPasswordRequestRepository.findAllByRequestIdUserId(id);
     }
 }

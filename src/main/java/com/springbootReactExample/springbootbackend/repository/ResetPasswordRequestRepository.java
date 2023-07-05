@@ -5,8 +5,12 @@ import com.springbootReactExample.springbootbackend.model.requests.ResetPassword
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
-public interface resetPasswordRequestRepository extends JpaRepository<ResetPasswordRequest, RequestId> {
+public interface ResetPasswordRequestRepository extends JpaRepository<ResetPasswordRequest, RequestId> {
     //TODO: findByUserId and findByLocalDateTime
+    List<ResetPasswordRequest> findAllByRequestIdUserId(String userId);
+
 
 }

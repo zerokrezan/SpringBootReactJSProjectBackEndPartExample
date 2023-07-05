@@ -5,11 +5,10 @@ import com.springbootReactExample.springbootbackend.exceptions.UserAlreadyExists
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
-import com.springbootReactExample.springbootbackend.model.requests.Request;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
 import com.springbootReactExample.springbootbackend.model.requests.ResetPasswordRequest;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
-import com.springbootReactExample.springbootbackend.repository.resetPasswordRequestRepository;
+import com.springbootReactExample.springbootbackend.repository.ResetPasswordRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -30,7 +29,7 @@ public class UserService implements UserDetailsService {
 	@Autowired
 	private final UserRepository userRepository;
 	@Autowired
-	private final resetPasswordRequestRepository resetPasswordRequestRepository;
+	private final ResetPasswordRequestRepository resetPasswordRequestRepository;
 
 	//DONE: check for email/id existing before creating new user
 	//TODO: PasswordEncryption has to be done for DB storage
@@ -126,10 +125,10 @@ public class UserService implements UserDetailsService {
 				user.get().setPassword(newPassword);
 			}else {
 				LOGGER.error(new PasswordIsInUseException().toString());
-				LOGGER.error("deleting this request of type RequestPasswordReset with id: "+ id + " and requestTime: "+ requestTime);
+				LOGGER.error("deleting this request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime);
 				Optional<ResetPasswordRequest> request =  resetPasswordRequestRepository.findById(new RequestId(id, requestTime));
 				request.ifPresent(resetPasswordRequestRepository::delete);
-				LOGGER.error("request of type RequestPasswordReset with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
+				LOGGER.error("request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
 				throw new PasswordIsInUseException();
 			}
 			RequestId requestId = new RequestId(id, requestTime);
@@ -140,12 +139,21 @@ public class UserService implements UserDetailsService {
 		}
 	}
 
-	public void requestPasswordReset(RequestId requestId) {
-		LOGGER.info(requestId.getUserId());
-		LOGGER.info(requestId.getLocalDateTime());
+	public void requestPasswordReset(RequestId requestId, String newPassword) {
 		LOGGER.info("user: "+ requestId.getUserId() + " is requesting PasswordRequest!");
-		resetPasswordRequestRepository.save(new ResetPasswordRequest(requestId));
-		LOGGER.info("PasswordRequest by user: "+ requestId.getUserId() + " just requested.");
+		resetPasswordRequestRepository.save(new ResetPasswordRequest(requestId, newPassword));
+		LOGGER.info("ResetPasswordRequest by user: "+ requestId.getUserId() + " just requested.");
 		LOGGER.info("waiting for admin's action!");
+	}
+
+	//TODO: after refusing the request let user a notice
+	public void refusePasswordReset(String id, String requestTime, String newPassword) {
+		LOGGER.error("refusing this request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime);
+		Optional<ResetPasswordRequest> request =  resetPasswordRequestRepository.findById(new RequestId(id, requestTime));
+		request.ifPresent(resetPasswordRequestRepository::delete);
+		LOGGER.error("request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
+
+
+
 	}
 }
