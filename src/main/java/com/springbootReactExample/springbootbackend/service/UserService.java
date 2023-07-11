@@ -108,10 +108,13 @@ public class UserService implements UserDetailsService {
 			throw new UserDoesNotExistException();
 		}
 		LOGGER.info("check if user with email/ID: " + URLDecoder.decode(username, StandardCharsets.UTF_8) + " exists");
-		User user2 = userRepository.findById(URLDecoder.decode(username, StandardCharsets.UTF_8))
-				.orElseThrow(UserDoesNotExistException::new);
+		Optional<User> user2 = userRepository.findById(URLDecoder.decode(username, StandardCharsets.UTF_8));
+		if (user2.isEmpty()){
+			LOGGER.error(new UserDoesNotExistException().toString());
+			throw new UserDoesNotExistException();
+		}
 
-		return new SecurityUser(user2);
+		return new SecurityUser(user2.get());
 
 	}
 
@@ -139,6 +142,7 @@ public class UserService implements UserDetailsService {
 		}
 	}
 
+	//TODO: check before resetting password if newPassword != password -> Frontend
 	public void requestPasswordReset(RequestId requestId, String newPassword) {
 		LOGGER.info("user: "+ requestId.getUserId() + " is requesting PasswordRequest!");
 		resetPasswordRequestRepository.save(new ResetPasswordRequest(requestId, newPassword));

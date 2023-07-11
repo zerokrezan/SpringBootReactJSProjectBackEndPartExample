@@ -71,7 +71,7 @@ public class UserController {
 	public void createUser(@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("id") String id,
 						   @RequestParam("password") String password){
 		try{
-			LOGGER.info(firstName +" " +lastName+" " + id+" " + password);
+			LOGGER.info("Create new user "+"with firstName: "+firstName +" lastName: "+lastName+" email/ID: " + id+" and password: " + password);
 			this.userService.createUser(new User(firstName, lastName, id, password));
 		}catch (Exception exception){
 			LOGGER.error(exception);
@@ -137,7 +137,7 @@ public class UserController {
 	}
 
 	//DONE: assignment of user's created requests to fitting user
-	@PreAuthorize("hasRole('USER')")
+	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("requests/{id}")
 	public <T extends Request> List<T> getUserRequests(@PathVariable("id") String id){
 		return this.requestService.getUserRequests(id);
