@@ -5,8 +5,12 @@ import com.springbootReactExample.springbootbackend.exceptions.UserAlreadyExists
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.SecurityUser;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.notifications.Notification;
+import com.springbootReactExample.springbootbackend.model.notifications.NotificationId;
+import com.springbootReactExample.springbootbackend.model.notifications.ResetPasswordNotification;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
 import com.springbootReactExample.springbootbackend.model.requests.ResetPasswordRequest;
+import com.springbootReactExample.springbootbackend.repository.ResetPasswordNotificationRepository;
 import com.springbootReactExample.springbootbackend.repository.UserRepository;
 import com.springbootReactExample.springbootbackend.repository.ResetPasswordRequestRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +24,17 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class UserService implements UserDetailsService {
 	private static final Logger LOGGER = LogManager.getLogger(UserService.class);
-	@Autowired
 	private final UserRepository userRepository;
-	@Autowired
 	private final ResetPasswordRequestRepository resetPasswordRequestRepository;
+	private final ResetPasswordNotificationRepository resetPasswordNotificationRepository;
 
-	//DONE: check for email/id existing before creating new user
 	//TODO: PasswordEncryption has to be done for DB storage
 	public void createUser(User user){
 		//BCryptPasswordEncoder becrypt = new BCryptPasswordEncoder();
@@ -113,12 +116,9 @@ public class UserService implements UserDetailsService {
 			LOGGER.error(new UserDoesNotExistException().toString());
 			throw new UserDoesNotExistException();
 		}
-
 		return new SecurityUser(user2.get());
-
 	}
 
-	//DONE: validate if newPassword is used from another user
 	public void resetUsersPassword(String id,String requestTime ,String newPassword) {
 		Optional<User> user = userRepository.findById(id);
 		if (user.isPresent()){
@@ -137,12 +137,13 @@ public class UserService implements UserDetailsService {
 			RequestId requestId = new RequestId(id, requestTime);
 			Optional<ResetPasswordRequest> resetPasswordRequest = resetPasswordRequestRepository.findById(requestId);
 			resetPasswordRequest.ifPresent(resetPasswordRequestRepository::delete);
-
 			userRepository.saveAndFlush(user.get());
+			resetPasswordNotificationRepository.save(new ResetPasswordNotification(new NotificationId(id, LocalDateTime.now().toString()), "DONE"));
+			LOGGER.info("notification has just been sent to user.");
 		}
 	}
 
-	//TODO: check before resetting password if newPassword != password -> Frontend
+	//TODO: check before requesting password request if newPassword != password -> Frontend
 	public void requestPasswordReset(RequestId requestId, String newPassword) {
 		LOGGER.info("user: "+ requestId.getUserId() + " is requesting PasswordRequest!");
 		resetPasswordRequestRepository.save(new ResetPasswordRequest(requestId, newPassword));
@@ -150,14 +151,13 @@ public class UserService implements UserDetailsService {
 		LOGGER.info("waiting for admin's action!");
 	}
 
-	//TODO: after refusing the request let user a notice
-	public void refusePasswordReset(String id, String requestTime, String newPassword) {
+	//DONE: after refusing the request let user a notice
+	public void refusePasswordReset(String id, String requestTime) {
 		LOGGER.error("refusing this request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime);
 		Optional<ResetPasswordRequest> request =  resetPasswordRequestRepository.findById(new RequestId(id, requestTime));
 		request.ifPresent(resetPasswordRequestRepository::delete);
-		LOGGER.error("request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
-
-
-
+		LOGGER.info("request of type ResetPasswordRequest with id: "+ id + " and requestTime: "+ requestTime + " has just been deleted!");
+		resetPasswordNotificationRepository.save(new ResetPasswordNotification(new NotificationId(id, LocalDateTime.now().toString()), "DONE"));
+		LOGGER.info("notification has just been sent to user.");
 	}
 }

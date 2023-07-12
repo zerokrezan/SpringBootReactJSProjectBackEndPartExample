@@ -11,6 +11,4 @@ import java.util.List;
 public interface ResetPasswordRequestRepository extends JpaRepository<ResetPasswordRequest, RequestId> {
     //DONE: findByUserId and findByLocalDateTime
     List<ResetPasswordRequest> findAllByRequestIdUserId(String userId);
-    List<ResetPasswordRequest> findAllByRequestIdLocalDateTime(String localDateTime);
-
 }

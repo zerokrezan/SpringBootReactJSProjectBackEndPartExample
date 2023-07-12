@@ -14,7 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RequestService {
     private static final Logger LOGGER = LogManager.getLogger(RequestService.class);
-    @Autowired
     private final ResetPasswordRequestRepository resetPasswordRequestRepository;
 
     @SuppressWarnings("unchecked")

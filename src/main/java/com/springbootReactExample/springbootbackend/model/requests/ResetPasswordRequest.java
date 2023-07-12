@@ -10,10 +10,12 @@ import lombok.Setter;
 @Setter
 @Table(name = "resetpasswordrequests")
 public class ResetPasswordRequest extends Request {
-
-    //DONE:newPassword
+    @Override
     @EmbeddedId
-    private RequestId requestId;
+    public RequestId getRequestId() {
+        return super.getRequestId();
+    }
+
     private String newPassword;
     public ResetPasswordRequest(RequestId requestId, String newPassword) {
         this.requestId = requestId;

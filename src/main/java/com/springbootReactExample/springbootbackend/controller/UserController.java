@@ -2,8 +2,10 @@ package com.springbootReactExample.springbootbackend.controller;
 
 import com.springbootReactExample.springbootbackend.exceptions.UserDoesNotExistException;
 import com.springbootReactExample.springbootbackend.model.User;
+import com.springbootReactExample.springbootbackend.model.notifications.Notification;
 import com.springbootReactExample.springbootbackend.model.requests.Request;
 import com.springbootReactExample.springbootbackend.model.requests.RequestId;
+import com.springbootReactExample.springbootbackend.service.NotificationService;
 import com.springbootReactExample.springbootbackend.service.RequestService;
 import com.springbootReactExample.springbootbackend.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +34,8 @@ public class UserController {
 	private final UserService userService;
 	@Autowired
 	private final RequestService requestService;
+	@Autowired
+	private final NotificationService notificationService;
 
 	@PreAuthorize("hasRole('ADMIN')")
 	@GetMapping("users")
@@ -39,8 +43,6 @@ public class UserController {
 		return this.userService.getUsers();
 	}
 
-	//DONE: password as requestParam for createUser() - method
-	//DONE: requestPassword method for admin
 	//DONE: resetUsersPasswordRequest method for user to admin
 	//TODO: resetUsersMail method for user to admin
 
@@ -108,24 +110,21 @@ public class UserController {
 		this.userService.resetUsersPassword(id,requestTime,newPassword);
 	}
 
-	//DONE: admin refuses resetPassword request
 	/**
 	 * admin refuses resetPasword request
 	 * @return
 	 * @param
 	 */
 	@PreAuthorize("hasRole('ADMIN')")
-	@DeleteMapping("users/{id}/{requestTime}/reset-password")
-	public void refuseResetPasswordRequest(@PathVariable("id") String id, @PathVariable("requestTime") String requestTime,
-										   @RequestParam("newPassword") String newPassword ) {
-		this.userService.refusePasswordReset(id, requestTime, newPassword);
+	@DeleteMapping("users/refusePasswordReset/{id}/{requestTime}")
+	public void refuseResetPasswordRequest(@PathVariable("id") String id, @PathVariable("requestTime") String requestTime) {
+		this.userService.refusePasswordReset(id, requestTime);
 
 	}
 
 	@PreAuthorize("hasRole('USER')")
 	@PostMapping("requestPasswordReset")
 	public void requestPasswordReset(@RequestParam("id") String id, @RequestParam("newPassword") String newPassword){
-		//DONE: own request table/entitiy in DB -> no assign needed to users class because only the admin has access to requests table
 		this.userService.requestPasswordReset(new RequestId(id, LocalDateTime.now().toString()), newPassword);
 	}
 
@@ -136,11 +135,16 @@ public class UserController {
 		return this.requestService.getRequests();
 	}
 
-	//DONE: assignment of user's created requests to fitting user
 	@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 	@GetMapping("requests/{id}")
 	public <T extends Request> List<T> getUserRequests(@PathVariable("id") String id){
 		return this.requestService.getUserRequests(id);
+	}
+
+	@PreAuthorize("hasRole('USER')")
+	@GetMapping("notifications")
+	public <T extends Notification> List<T> getNotifications(@RequestParam("id") String id){
+		return this.notificationService.getNotifications(id);
 	}
 
 }

@@ -7,7 +7,7 @@ import lombok.Setter;
 @Setter
 public abstract class Request {
 
-    private RequestId requestId;
+    public RequestId requestId;
     public Request() {
     }
 }
